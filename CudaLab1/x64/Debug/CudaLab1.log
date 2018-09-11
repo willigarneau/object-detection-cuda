@@ -1,6 +1,15 @@
-﻿  Compiling CUDA source file Kernel.cu...
-  
-  E:\Session 5\S.I.I\Semaine 4\Travail Pratique 1\CudaLab1>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.2\bin\nvcc.exe" -gencode=arch=compute_30,code=\"sm_30,compute_30\" --use-local-env -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64" -x cu  -IC:\opencv\..\..\include -IC:\opencv\build\include -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.2\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.2\include"  -G   --keep-dir x64\Debug -maxrregcount=0  --machine 64 --compile -cudart static  -g   -D_DEBUG -D_CONSOLE -D_UNICODE -DUNICODE -Xcompiler "/EHsc /W3 /nologo /Od /Fdx64\Debug\vc140.pdb /FS /Zi /RTC1 /MDd " -o x64\Debug\Kernel.cu.obj "E:\Session 5\S.I.I\Semaine 4\Travail Pratique 1\CudaLab1\Kernel.cu" 
-  Kernel.cu
-  main.cpp
+﻿  main.cpp
+e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(14): warning C4005: 'MIN' : redéfinition de macro
+  c:\opencv\build\include\opencv2\core\cvdef.h(334): note: voir la définition précédente de 'MIN'
+e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(15): warning C4005: 'MAX' : redéfinition de macro
+  c:\opencv\build\include\opencv2\core\cvdef.h(338): note: voir la définition précédente de 'MAX'
+e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(22): warning C4244: '=' : conversion de 'float' en 'uchar', perte possible de données
+e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(23): warning C4244: '=' : conversion de 'float' en 'uchar', perte possible de données
+e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(24): warning C4244: '=' : conversion de 'float' en 'uchar', perte possible de données
+e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(26): warning C4305: '+=' : troncation de 'int' à 'uchar'
+e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(34): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(35): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(36): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
+e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(44): warning C4244: 'initialisation' : conversion de 'float' en 'uchar', perte possible de données
+e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(47): warning C4244: '=' : conversion de 'float' en 'uchar', perte possible de données
   CudaLab1.vcxproj -> E:\Session 5\S.I.I\Semaine 4\Travail Pratique 1\x64\Debug\CudaLab1.exe
