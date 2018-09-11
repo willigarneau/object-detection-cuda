@@ -12,12 +12,13 @@
 
 using namespace cv;
 
+extern "C" void parallelRGBToHSV(uchar *inputMatrixPointer, uchar *outputMatrixPointer, dim3 matrixDimension);
+
 #define MIN(a,b)      ((a) < (b) ? (a) : (b))
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #define MIN3(a,b,c)   MIN((a), MIN((b), (c)))
 #define MAX3(a,b,c) MAX((a), MAX((b), (c)))
 
-const int HUE_DEGREE =  512;
 
 uchar HueConversion(float blue, float green, float red, float delta, float maximum) {
 	uchar h;
@@ -42,7 +43,7 @@ void rgbToHSV(Mat frame) {
 
 			float delta = maximum - minimum;
 			uchar h = HueConversion(blue, green, red, delta, maximum);
-			hsv[0] = h /2;
+			hsv[0] = h / 2;
 			uchar s = (delta / maximum) * 255;
 			hsv[1] = s;
 			float v = (maximum) * 255;
@@ -56,12 +57,18 @@ void rgbToHSV(Mat frame) {
 int main()
 {
 	// original frame
-	Mat originalframe = imread("scene.jpg");
+	Mat originalframe = imread("lena.png");
+	Mat cpuConvertedHSVFrame = imread("lena.png");
 
-	rgbToHSV(originalframe);
+	rgbToHSV(cpuConvertedHSVFrame);
+	Mat inputParallelConvertedFrame = imread("lena.png");
+	Mat outputParallelConvertedFrame = imread("lena.png");
+	parallelRGBToHSV(inputParallelConvertedFrame.data, outputParallelConvertedFrame.data,
+		dim3(inputParallelConvertedFrame.rows, inputParallelConvertedFrame.cols));
 
-
-	imshow("original frame", originalframe);;
+	imshow("original frame", originalframe);
+	imshow("CPU converted HSV frame", cpuConvertedHSVFrame);
+	imshow("GPU converted HSV frame", outputParallelConvertedFrame);
 
 	waitKey(0);
 	return 0;
