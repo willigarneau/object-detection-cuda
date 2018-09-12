@@ -67,3 +67,5 @@ uchar HueConversion(float blue, float green, float red, float delta, float maxim
 #define MIN3(a,b,c)   MIN((a), MIN((b), (c)))
 #define MAX3(a,b,c) MAX((a), MAX((b), (c)))
 ```
+
+#### This project is still in development. If you wish to contribute to it, dont't be shy ☺️
