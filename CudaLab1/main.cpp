@@ -12,7 +12,15 @@
 
 using namespace cv;
 
-extern "C" void parallelRGBToHSV(uchar *inputMatrixPointer, uchar *outputMatrixPointer, dim3 matrixDimension);
+extern "C" void parallelRGBToHSV(Mat *inputImage, Mat *outputImage);
+extern "C" void parallelBackgroundSubstraction(
+	Mat *inputImage,
+	Mat *outputImage,
+	uchar *backgroundColor,
+	bool replaceForeground,
+	uchar *foregroundColor,
+	uchar *treshMin,
+	uchar *treshMax);
 
 #define MIN(a,b)      ((a) < (b) ? (a) : (b))
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
@@ -20,11 +28,11 @@ extern "C" void parallelRGBToHSV(uchar *inputMatrixPointer, uchar *outputMatrixP
 #define MAX3(a,b,c) MAX((a), MAX((b), (c)))
 
 
-uchar HueConversion(float blue, float green, float red, float delta, float maximum) {
-	uchar h;
+float HueConversion(float blue, float green, float red, float delta, float maximum) {
+	float h;
 	if (red == maximum) { h = 60* (green - blue) / delta; }
-	if (green == maximum) { h = 60 * (blue - red) / delta + 120; }
-	if (blue == maximum) { h = 60 * (red - green) / delta + 240; }
+	if (green == maximum) { h = 60 * (blue - red) / delta + 2; }
+	if (blue == maximum) { h = 60 * (red - green) / delta + 4; }
 
 	if (h < 0) { h += 360; }
 	return h;
@@ -40,14 +48,14 @@ void rgbToHSV(Mat frame) {
 
 			float maximum = MAX3(red, green, blue);
 			float minimum = MIN3(red, green, blue);
-
 			float delta = maximum - minimum;
-			uchar h = HueConversion(blue, green, red, delta, maximum);
-			hsv[0] = h / 2;
-			uchar s = (delta / maximum) * 255;
-			hsv[1] = s;
-			float v = (maximum) * 255;
-			hsv[2] = v;
+
+			float hue = HueConversion(blue, green, red, delta, maximum);
+			hsv[0] = (uchar)(hue / 2);
+			float saturation = (delta / maximum) * 255.0;
+			hsv[1] = (uchar)saturation;
+			float value = (maximum) * 255.0;
+			hsv[2] = (uchar)value;
 
 			frame.at<Vec3b>(rows, cols) = hsv;
 		}
@@ -60,15 +68,23 @@ int main()
 	Mat originalframe = imread("lena.png");
 	Mat cpuConvertedHSVFrame = imread("lena.png");
 
+	// rgb to hsv conversion
 	rgbToHSV(cpuConvertedHSVFrame);
-	Mat inputParallelConvertedFrame = imread("lena.png");
-	Mat outputParallelConvertedFrame = imread("lena.png");
-	parallelRGBToHSV(inputParallelConvertedFrame.data, outputParallelConvertedFrame.data,
-		dim3(inputParallelConvertedFrame.rows, inputParallelConvertedFrame.cols));
+	Mat inputHSVImage = imread("scene.png");
+	Mat HSVImage = imread("scene.png");
+	parallelRGBToHSV(&inputHSVImage, &HSVImage);
+
+	// background substraction
+	Mat outputBackgroundSubstraction = HSVImage;
+	uchar backgroundColor[3] = { 0, 0, 0 };
+	uchar foregroundColor[3] = { 255, 0, 0 };
+	uchar treshMin[3] = { 100, 100, 100 };
+	uchar treshMax[3] = { 200, 200, 200 };
+	parallelBackgroundSubstraction(&HSVImage, &outputBackgroundSubstraction, backgroundColor, true, foregroundColor, treshMin, treshMax);
 
 	imshow("original frame", originalframe);
 	imshow("CPU converted HSV frame", cpuConvertedHSVFrame);
-	imshow("GPU converted HSV frame", outputParallelConvertedFrame);
+	imshow("GPU converted HSV frame", HSVImage);
 
 	waitKey(0);
 	return 0;
