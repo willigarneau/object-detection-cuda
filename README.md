@@ -1,4 +1,9 @@
-# Motion detection with Cuda and OpenCV
+  <h1 align="center">Motion Detection - Cuda</h1> 
+  <p align="center">
+  <img src="https://img.shields.io/badge/License-MIT-blue.svg">
+  </p>
+
+
 > Implementation of a motion detection solution with OpenCV and Cuda, as part of the Intelligent Industrial System Course.
 
 ### Part 1: Convert an RGB color image to HSV, without using an external library.
