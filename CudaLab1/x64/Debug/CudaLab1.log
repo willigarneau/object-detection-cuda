@@ -1,11 +1,1 @@
-﻿  main.cpp
-e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(25): warning C4005: 'MIN' : redéfinition de macro
-  c:\opencv\build\include\opencv2\core\cvdef.h(334): note: voir la définition précédente de 'MIN'
-e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(26): warning C4005: 'MAX' : redéfinition de macro
-  c:\opencv\build\include\opencv2\core\cvdef.h(338): note: voir la définition précédente de 'MAX'
-e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(45): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(46): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(47): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(55): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-e:\session 5\s.i.i\semaine 4\travail pratique 1\cudalab1\main.cpp(57): warning C4244: 'initialisation' : conversion de 'double' en 'float', perte possible de données
-  CudaLab1.vcxproj -> E:\Session 5\S.I.I\Semaine 4\Travail Pratique 1\x64\Debug\CudaLab1.exe
+﻿  CudaLab1.vcxproj -> E:\Session 5\S.I.I\Semaine 4\Travail Pratique 1\x64\Debug\CudaLab1.exe

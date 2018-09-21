@@ -7,25 +7,24 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
+#include "AxisCommunication.h"
+
 #include <opencv2/core/core.hpp> 
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2\imgproc.hpp>
 
 using namespace cv;
 
-extern "C" void parallelRGBToHSV(Mat *inputImage, Mat *outputImage);
-extern "C" void parallelBackgroundSubstraction(
-	Mat *inputImage,
-	Mat *outputImage,
-	uchar *backgroundColor,
-	bool replaceForeground,
-	uchar *foregroundColor,
-	uchar *treshMin,
-	uchar *treshMax);
+extern "C" void parallelObjectDetection(Mat *inputImage, Mat *outputImage, bool replaceBackground, int treshMin, int treshMax, int foreground, int background);
+extern "C" void parallelSobelFilter(Mat *inputImage, Mat *outputImage);
+
 
 #define MIN(a,b)      ((a) < (b) ? (a) : (b))
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #define MIN3(a,b,c)   MIN((a), MIN((b), (c)))
 #define MAX3(a,b,c) MAX((a), MAX((b), (c)))
+
+bool replaceBackground = false;
 
 
 float HueConversion(float blue, float green, float red, float delta, float maximum) {
@@ -62,29 +61,83 @@ void rgbToHSV(Mat frame) {
 	}
 }
 
+void AxisCamera() {
+	// Set initial matrix for gpu processing
+	Mat inputThresholdImage, outputThresholdImage, outputSobelImage;
+
+	Axis axis("10.128.3.4", "etudiant", "gty970");
+	while (true) {
+		axis.GetImage(inputThresholdImage);
+		axis.GetImage(outputThresholdImage);
+		axis.GetImage(outputSobelImage);
+
+		parallelObjectDetection(&inputThresholdImage, &outputThresholdImage, replaceBackground, 75, 200, 255, 0);
+		imshow("Original frame", inputThresholdImage);
+
+		if (replaceBackground) {
+			// Convert result patrix to grayscale
+			cvtColor(outputThresholdImage, outputThresholdImage, CV_RGB2GRAY);
+			cvtColor(outputSobelImage, outputSobelImage, CV_RGB2GRAY);
+
+			//// GPU process for applying sobel filter
+			parallelSobelFilter(&outputThresholdImage, &outputSobelImage);
+			imshow("GPU converted Sobel frame", outputThresholdImage);
+		}
+		else {
+			imshow("GPU converted Threshold frame", outputThresholdImage);
+			parallelObjectDetection(&inputThresholdImage, &outputThresholdImage, true, 75, 170, 255, 0);
+			// Convert result patrix to grayscale
+			cvtColor(outputThresholdImage, outputThresholdImage, CV_RGB2GRAY);
+			cvtColor(outputSobelImage, outputSobelImage, CV_RGB2GRAY);
+
+			// GPU process for applying sobel filter
+			parallelSobelFilter(&outputThresholdImage, &outputSobelImage);
+		}
+
+		imshow("Axis PTZ", outputSobelImage);
+		waitKey(5);
+	}
+	axis.ReleaseCam();
+}
+
 int main()
 {
-	// original frame
-	Mat originalframe = imread("lena.png");
-	Mat cpuConvertedHSVFrame = imread("lena.png");
-
-	// rgb to hsv conversion
+	// Convert HSV image on cpu
+	Mat cpuConvertedHSVFrame = imread("scene2.png");
 	rgbToHSV(cpuConvertedHSVFrame);
-	Mat inputHSVImage = imread("scene.png");
-	Mat HSVImage = imread("scene.png");
-	parallelRGBToHSV(&inputHSVImage, &HSVImage);
 
-	// background substraction
-	Mat outputBackgroundSubstraction = HSVImage;
-	uchar backgroundColor[3] = { 0, 0, 0 };
-	uchar foregroundColor[3] = { 255, 0, 0 };
-	uchar treshMin[3] = { 100, 100, 100 };
-	uchar treshMax[3] = { 200, 200, 200 };
-	parallelBackgroundSubstraction(&HSVImage, &outputBackgroundSubstraction, backgroundColor, true, foregroundColor, treshMin, treshMax);
+	AxisCamera();
 
-	imshow("original frame", originalframe);
+	// Set initial matrix for gpu processing
+	Mat inputThresholdImage = imread("scene2.png");
+	Mat ThresholdImage = imread("scene2.png");
+	Mat outputSobelImage = imread("scene2.png");
+
+	// GPU process to detect object
+	parallelObjectDetection(&inputThresholdImage, &ThresholdImage, replaceBackground, 75, 200, 255, 0);
+
+	if (replaceBackground) {
+		// Convert result patrix to grayscale
+		cvtColor(ThresholdImage, ThresholdImage, CV_RGB2GRAY);
+		cvtColor(outputSobelImage, outputSobelImage, CV_RGB2GRAY);
+
+		//// GPU process for applying sobel filter
+		parallelSobelFilter(&ThresholdImage, &outputSobelImage);
+		imshow("GPU converted Threshold frame", ThresholdImage);
+	}
+	else {
+		imshow("GPU converted Threshold frame", ThresholdImage);
+		parallelObjectDetection(&inputThresholdImage, &ThresholdImage, true, 75, 200, 255, 0);
+		// Convert result patrix to grayscale
+		cvtColor(ThresholdImage, ThresholdImage, CV_RGB2GRAY);
+		cvtColor(outputSobelImage, outputSobelImage, CV_RGB2GRAY);
+
+		//// GPU process for applying sobel filter
+		parallelSobelFilter(&ThresholdImage, &outputSobelImage);
+	}
+	// Show result images
 	imshow("CPU converted HSV frame", cpuConvertedHSVFrame);
-	imshow("GPU converted HSV frame", HSVImage);
+	imshow("GPU sobel filtered frame", outputSobelImage);
 
 	waitKey(0);
 	return 0;
