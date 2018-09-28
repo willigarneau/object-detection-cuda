@@ -73,7 +73,7 @@ uchar HueConversion(float blue, float green, float red, float delta, float maxim
 #define MAX3(a,b,c) MAX((a), MAX((b), (c)))
 ```
 
-### Part 1: Convert an HSV frame to Sobel Filter, without using an external library.
+### Part 2: Convert an HSV frame to Sobel Filter, without using an external library.
 
 This part has been made in Cuda, to get a quicker result.
 
